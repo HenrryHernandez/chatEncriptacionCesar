@@ -17,12 +17,11 @@ public class Cliente extends JFrame {
     private JButton btnDesencriptar;
     private JScrollPane largoMensaje;
     private JScrollPane largoEncriptado;
-    
-    
+
     private String mensaje = "";
     private String ip_servidor;
-    public String mensajeEncriptado;
-    
+    //public String mensajeEncriptado;
+
     private ObjectOutputStream output;
     private ObjectInputStream input;
     private Socket conexion;
@@ -47,10 +46,10 @@ public class Cliente extends JFrame {
         largoMensaje = new JScrollPane(txtChat);
         largoMensaje.setBounds(20, 50, 440, 150);
         add(largoMensaje);
-        
+
         txtChatEncriptado = new JTextArea();
         txtChatEncriptado.setEditable(false);
-        
+
         largoEncriptado = new JScrollPane(txtChatEncriptado);
         largoEncriptado.setBounds(20, 280, 440, 150);
         add(largoEncriptado);
@@ -63,11 +62,20 @@ public class Cliente extends JFrame {
         btnEnviar = new JButton("Enviar");
         btnEnviar.setBounds(340, 220, 100, 25);
         add(btnEnviar);
+        if (tfClave.getText().equals(" ")) {
+            btnEnviar.setEnabled(false);
+        } else {
+            btnEnviar.setEnabled(true);
+        }
         btnEnviar.addActionListener(
                 new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                enviar(tfMensajeEnviar.getText());
-                tfMensajeEnviar.setText("");
+                if (tfClave.getText().equals("") || malaClave(tfClave.getText())) {
+                    JOptionPane.showMessageDialog(null, "Ingrese clave válida");
+                } else {
+                    enviar(tfMensajeEnviar.getText());
+                    tfMensajeEnviar.setText("");
+                }
             }
         }
         );
@@ -78,9 +86,12 @@ public class Cliente extends JFrame {
         btnDesencriptar.addActionListener(
                 new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                txtChatEncriptado.setText("");
-                txtChatEncriptado.setText(desencriptar(mensajeEncriptado, Integer.parseInt(tfClave.getText())));
-
+                if (tfClave.getText().equals("") || malaClave(tfClave.getText())) {
+                    JOptionPane.showMessageDialog(null, "Ingrese clave válida");
+                } else {
+                    txtChatEncriptado.setText("");
+                    txtChatEncriptado.setText(desencriptar(mensaje, Integer.parseInt(tfClave.getText())));
+                }
             }
         }
         );
@@ -88,6 +99,15 @@ public class Cliente extends JFrame {
         setVisible(true);
     }
 
+    boolean malaClave(String clave){
+        for(int i = 0; i < clave.length(); i++){
+            if(Character.isLetter(clave.charAt(i))){
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public String encriptar(String palabra, int clave) {
         //Obtener texto plano
         String caracteres = palabra.toUpperCase();
@@ -130,7 +150,7 @@ public class Cliente extends JFrame {
 
     public void iniciarCliente() {
         try {
-            ponerClave(JOptionPane.showInputDialog("Inserta una clave de encriptación"));
+            //ponerClave(JOptionPane.showInputDialog("Inserta una clave de encriptación"));
             conectarAlServidor();
             configurarFlujosDeDatos();
             chateandoAndo();
@@ -142,8 +162,8 @@ public class Cliente extends JFrame {
             cerrarConexiones();
         }
     }
-    
-    void ponerClave(String clave){
+
+    void ponerClave(String clave) {
         tfClave.setText(clave);
     }
 
@@ -163,7 +183,7 @@ public class Cliente extends JFrame {
         do {
             try {
                 mensaje = (String) input.readObject();
-                mensajeEncriptado = mensaje;
+                //mensajeEncriptado = mensaje;
                 imprimirMensaje("\nServidor: " + mensaje);
             } catch (ClassNotFoundException classNotFoundException) {
                 imprimirMensaje("Paquete no identificado");
