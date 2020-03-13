@@ -16,10 +16,10 @@ public class Servidor extends JFrame {
     private JButton btnDesencriptar;
     private JScrollPane largoMensaje;
     private JScrollPane largoEncriptado;
-    
+
     private String mensaje = "";
-    public String mensajeEncriptado;
-    
+    //public String mensajeEncriptado;
+
     private ObjectOutputStream output;
     private ObjectInputStream input;
     private ServerSocket servidor;
@@ -48,7 +48,7 @@ public class Servidor extends JFrame {
 
         txtChatEncriptado = new JTextArea();
         txtChatEncriptado.setEditable(false);
-        
+
         largoEncriptado = new JScrollPane(txtChatEncriptado);
         largoEncriptado.setBounds(20, 280, 440, 150);
         add(largoEncriptado);
@@ -64,8 +64,13 @@ public class Servidor extends JFrame {
         btnEnviar.addActionListener(
                 new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                enviar(tfMensajeEnviar.getText());
-                tfMensajeEnviar.setText("");
+                
+                if (tfClave.getText().equals("") || malaClave(tfClave.getText())) {
+                    JOptionPane.showMessageDialog(null, "Ingrese clave válida");
+                } else {
+                    enviar(tfMensajeEnviar.getText());
+                    tfMensajeEnviar.setText("");
+                }
             }
         }
         );
@@ -76,9 +81,12 @@ public class Servidor extends JFrame {
         btnDesencriptar.addActionListener(
                 new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                txtChatEncriptado.setText("");
-                txtChatEncriptado.setText(desencriptar(mensajeEncriptado, Integer.parseInt(tfClave.getText())));
-
+                if (tfClave.getText().equals("") || malaClave(tfClave.getText())) {
+                    JOptionPane.showMessageDialog(null, "Ingrese clave válida");
+                } else {
+                    txtChatEncriptado.setText("");
+                    txtChatEncriptado.setText(desencriptar(mensaje, Integer.parseInt(tfClave.getText())));
+                }
             }
         }
         );
@@ -86,6 +94,15 @@ public class Servidor extends JFrame {
         setVisible(true);
     }
 
+    boolean malaClave(String clave){
+        for(int i = 0; i < clave.length(); i++){
+            if(Character.isLetter(clave.charAt(i))){
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public String encriptar(String palabra, int clave) {
         //Obtener texto plano
         String caracteres = palabra.toUpperCase();
@@ -128,11 +145,10 @@ public class Servidor extends JFrame {
 
     public void iniciarServidor() {
         try {
-            servidor = new ServerSocket(6789, 100); 
+            servidor = new ServerSocket(6789, 100);
             while (true) {
                 try {
-                    
-                    ponerClave(JOptionPane.showInputDialog("Inserta una clave de encriptación"));
+                    //ponerClave(JOptionPane.showInputDialog("Inserta una clave de encriptación"));
                     esperandoConexion();
                     configurarFlujosDeDatos();
                     chateandoAndo();
@@ -146,11 +162,10 @@ public class Servidor extends JFrame {
             ioException.printStackTrace();
         }
     }
-    
-    void ponerClave(String clave){
+
+    void ponerClave(String clave) {
         tfClave.setText(clave);
     }
-    
 
     private void esperandoConexion() throws IOException {
         imprimirMensaje("Esperando conexiones... \n");
@@ -158,7 +173,6 @@ public class Servidor extends JFrame {
         imprimirMensaje("Conectado con: " + conexion.getInetAddress().getHostName() + "\n-----------------------------------------------------------------------------------------\n");
     }
 
-    
     private void configurarFlujosDeDatos() throws IOException {
         output = new ObjectOutputStream(conexion.getOutputStream());
         output.flush();
@@ -167,12 +181,11 @@ public class Servidor extends JFrame {
 
     }
 
-    
     private void chateandoAndo() throws IOException {
         do {
             try {
                 mensaje = (String) input.readObject();
-                mensajeEncriptado = mensaje;
+                //mensajeEncriptado = mensaje;
                 imprimirMensaje("\nCliente: " + mensaje);
             } catch (ClassNotFoundException classNotFoundException) {
                 imprimirMensaje("Paquete no identificado");
@@ -184,8 +197,8 @@ public class Servidor extends JFrame {
         imprimirMensaje("\nCerrando la conexión...\n");
         try {
             output.close();
-            input.close(); 
-            conexion.close(); 
+            input.close();
+            conexion.close();
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }
