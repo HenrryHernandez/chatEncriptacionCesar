@@ -62,16 +62,11 @@ public class Cliente extends JFrame {
         btnEnviar = new JButton("Enviar");
         btnEnviar.setBounds(340, 220, 100, 25);
         add(btnEnviar);
-        if (tfClave.getText().equals(" ")) {
-            btnEnviar.setEnabled(false);
-        } else {
-            btnEnviar.setEnabled(true);
-        }
         btnEnviar.addActionListener(
                 new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 if (tfClave.getText().equals("") || malaClave(tfClave.getText())) {
-                    JOptionPane.showMessageDialog(null, "Ingrese clave válida");
+                    JOptionPane.showMessageDialog(null, "Ingrese clave de desencriptación válida");
                 } else {
                     enviar(tfMensajeEnviar.getText());
                     tfMensajeEnviar.setText("");
@@ -109,29 +104,25 @@ public class Cliente extends JFrame {
     }
     
     public String encriptar(String palabra, int clave) {
-        //Obtener texto plano
         String caracteres = palabra.toUpperCase();
-        char[] arreCar = caracteres.toCharArray();//Convertr String a un arreglo de caracteres
+        char[] arreCar = caracteres.toCharArray();
         String mensaje = "";
         char aux = 0;
 
         for (int i = 0; i < arreCar.length; i++) {
             if (arreCar[i] != 32) {
-                aux = (char) (((((int) arreCar[i] - 65) + clave) % 26) + 65); // Encripta mensajes.  minúsculas -65 mayúsculas 97
+                aux = (char) (((((int) arreCar[i] - 65) + clave) % 26) + 65);
             } else {
                 aux = 32;
             }
-            mensaje += aux;// Junta el mensaje encriptado
-
+            mensaje += aux;
         }
-
         return mensaje;
     }
 
     public String desencriptar(String palabra, int clave) {
-        //Obtener texto plano
         String caracteres = palabra.toUpperCase();
-        char[] arreCar = caracteres.toCharArray();//Convertr String a un arreglo de caracteres
+        char[] arreCar = caracteres.toCharArray();
         String mensaje = "";
         char aux = 0;
 
@@ -141,16 +132,13 @@ public class Cliente extends JFrame {
             } else {
                 aux = 32;
             }
-
-            mensaje += aux;// Junta el mensaje encriptado
+            mensaje += aux;
         }
-
         return mensaje;
     }
 
     public void iniciarCliente() {
         try {
-            //ponerClave(JOptionPane.showInputDialog("Inserta una clave de encriptación"));
             conectarAlServidor();
             configurarFlujosDeDatos();
             chateandoAndo();
@@ -188,7 +176,7 @@ public class Cliente extends JFrame {
             } catch (ClassNotFoundException classNotFoundException) {
                 imprimirMensaje("Paquete no identificado");
             }
-        } while (!mensaje.equals("Servidor: Salir"));
+        } while (true); //!mensaje.equals("Salir")
     }
 
     private void cerrarConexiones() {
