@@ -66,7 +66,7 @@ public class Servidor extends JFrame {
             public void actionPerformed(ActionEvent event) {
                 
                 if (tfClave.getText().equals("") || malaClave(tfClave.getText())) {
-                    JOptionPane.showMessageDialog(null, "Ingrese clave válida");
+                    JOptionPane.showMessageDialog(null, "Ingrese clave de desencriptación válida");
                 } else {
                     enviar(tfMensajeEnviar.getText());
                     tfMensajeEnviar.setText("");
@@ -104,29 +104,25 @@ public class Servidor extends JFrame {
     }
     
     public String encriptar(String palabra, int clave) {
-        //Obtener texto plano
         String caracteres = palabra.toUpperCase();
-        char[] arreCar = caracteres.toCharArray();//Convertr String a un arreglo de caracteres
+        char[] arreCar = caracteres.toCharArray();
         String mensaje = "";
         char aux = 0;
 
         for (int i = 0; i < arreCar.length; i++) {
             if (arreCar[i] != 32) {
-                aux = (char) (((((int) arreCar[i] - 65) + clave) % 26) + 65); // Encripta mensajes.  minúsculas -65 mayúsculas 97
+                aux = (char) (((((int) arreCar[i] - 65) + clave) % 26) + 65);
             } else {
                 aux = 32;
             }
-            mensaje += aux;// Junta el mensaje encriptado
-
+            mensaje += aux;
         }
-
         return mensaje;
     }
 
     public String desencriptar(String palabra, int clave) {
-        //Obtener texto plano
         String caracteres = palabra.toUpperCase();
-        char[] arreCar = caracteres.toCharArray();//Convertr String a un arreglo de caracteres
+        char[] arreCar = caracteres.toCharArray();
         String mensaje = "";
         char aux = 0;
 
@@ -136,10 +132,8 @@ public class Servidor extends JFrame {
             } else {
                 aux = 32;
             }
-
-            mensaje += aux;// Junta el mensaje encriptado
+            mensaje += aux;
         }
-
         return mensaje;
     }
 
@@ -148,7 +142,6 @@ public class Servidor extends JFrame {
             servidor = new ServerSocket(6789, 100);
             while (true) {
                 try {
-                    //ponerClave(JOptionPane.showInputDialog("Inserta una clave de encriptación"));
                     esperandoConexion();
                     configurarFlujosDeDatos();
                     chateandoAndo();
@@ -190,7 +183,7 @@ public class Servidor extends JFrame {
             } catch (ClassNotFoundException classNotFoundException) {
                 imprimirMensaje("Paquete no identificado");
             }
-        } while (!mensaje.equals("CLIENT - END"));
+        } while (true); //!mensaje.equals("Salir")
     }
 
     public void cerrarConexiones() {
